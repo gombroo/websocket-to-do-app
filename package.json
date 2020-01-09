@@ -1,0 +1,14 @@
+{
+  "name": "to-do-app",
+  "version": "1",
+  "main": "index.js",
+  "author": "gombroo",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  }
+}

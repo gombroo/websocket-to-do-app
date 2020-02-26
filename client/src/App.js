@@ -1,5 +1,6 @@
-import React from "react";
-import io from "socket.io-client";
+import React from 'react';
+import io from 'socket.io-client';
+import { v4 } from 'uuid';
 
 export class App extends React.Component {
   constructor(props) {
@@ -7,7 +8,7 @@ export class App extends React.Component {
 
     this.state = {
       tasks: [],
-      taskName: {},
+      taskName: '',
     };
   }
 
@@ -21,8 +22,8 @@ export class App extends React.Component {
     this.socket.on('addTask', newTask => {
       this.addTask(newTask);
     });
-    this.socket.on('removeTask', (index, task) => {
-      this.removeTask(index, task);
+    this.socket.on('removeTask', (newTasks) => {
+      this.setState({ tasks: newTasks });
     });
     this.socket.on('updateData', tasks => {
       this.updateData(tasks);
@@ -37,24 +38,32 @@ export class App extends React.Component {
     const { tasks } = this.state;
 
     // delete element which index is equal to id
-    tasks.forEach((task, index) => {
-      if(task.id === id) {
-        tasks.splice(index, 1);
-      }
-    });
+    const newTasks = tasks.filter((task) => task.id !== id);
+
     // update state
-    this.setState({ tasks: tasks });
+    this.setState({ tasks: newTasks });
 
     // emit to server what has been removed locally
     this.socket.emit('removeTask', id);
+  }
+
+  changeValue(event) {
+    this.setState({
+      taskName: event.target.value,
+    });
   }
   
   submitForm(event) {
     event.preventDefault();
     const { taskName } = this.state;
 
-    this.addTask(taskName);
-    this.socket.emit('addTask', taskName);
+    const task = {
+      id: v4(),
+      name: taskName,
+    }
+
+    this.addTask(task);
+    this.socket.emit('addTask', task);
   }
 
   addTask(newTask) {
@@ -84,14 +93,14 @@ export class App extends React.Component {
                 );
             })}
           </ul>
-          <form id='add-task-form' onSubmit={this.submitForm}>
+          <form id='add-task-form' onSubmit={this.submitForm.bind(this)}>
             <input
               className='text-input' 
               autoComplete="off" 
               type="text" 
               placeholder="Enter new task" 
-              value={this.state.taskName.name}
-              onChange={this.changeValue}
+              value={this.state.taskName}
+              onChange={this.changeValue.bind(this)}
             />
             <button className='btn' type='submit'>
               Add

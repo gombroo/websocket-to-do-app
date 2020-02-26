@@ -8,10 +8,6 @@ const server = app.listen(process.env.PORT || 8000, () => {
   console.log('Server is running...');
 });
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Not found...' });
-});
-
 const io = socket(server);
 
 io.on('connection', socket => {
@@ -25,10 +21,12 @@ io.on('connection', socket => {
     }
   });
 
-  socket.on('removeTask', (index, task) => {
-    if (tasks.find(taskToRemove => taskToRemove.id == task.id)) {
-      tasks.splice(index, 1);
-      socket.broadcast.emit('removeTask', index, task);
-    }
+  socket.on('removeTask', (id, newTasks) => {
+    tasks = tasks.filter((task) => task.id !== id);
+    socket.broadcast.emit('removeTask', newTasks);
   });
+});
+
+app.use((req, res) => {
+  res.status(404).send({ message: 'Not found...' });
 });

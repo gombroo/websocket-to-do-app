@@ -21,9 +21,9 @@ io.on('connection', socket => {
     }
   });
 
-  socket.on('removeTask', (id, newTasks) => {
+  socket.on('removeTask', (id) => {
     tasks = tasks.filter((task) => task.id !== id);
-    socket.broadcast.emit('removeTask', newTasks);
+    socket.broadcast.emit('removeTask', tasks);
   });
 });
 

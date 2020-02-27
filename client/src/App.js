@@ -63,6 +63,12 @@ export class App extends React.Component {
     }
 
     this.addTask(task);
+
+    // clear input field
+    this.setState({
+      taskName: '',
+    });
+    
     this.socket.emit('addTask', task);
   }
 
